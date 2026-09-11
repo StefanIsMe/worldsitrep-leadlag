@@ -1,0 +1,38 @@
+name: Daily lead-lag update
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 07:00 ICT daily (00:00 UTC) - after collectors land
+    - cron: "0 0 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: leadlag-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install matplotlib
+      - name: Update signals + market + analysis
+        env:
+          LEADLAG_PAT: ${{ secrets.LEADLAG_PAT }}
+        run: python update.py
+      - name: Commit results
+        shell: bash
+        run: |
+          git add -- signals market.csv result.json chart.png
+          git diff --cached --quiet && echo "no change" && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: daily lead-lag update"
+          git push
