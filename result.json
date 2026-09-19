@@ -1,18 +1,19 @@
 {
- "updated": "2026-09-18T03:55:34Z",
- "n_days": 20,
- "n comparable": 19,
- "spike_threshold": 279,
+ "updated": "2026-09-19T03:52:42Z",
+ "n_days": 21,
+ "n comparable": 20,
+ "spike_threshold": 270,
  "spike_days": [
+  "2026-09-01",
   "2026-09-02",
   "2026-09-03",
   "2026-09-08",
   "2026-09-09",
   "2026-09-10"
  ],
- "mean_move_after_spike": 0.038,
- "mean_move_baseline": 0.0136,
- "n_spike": 5,
+ "mean_move_after_spike": 0.0333,
+ "mean_move_baseline": 0.0129,
+ "n_spike": 6,
  "n_base": 14,
  "latest_yes": 0.23,
  "note": "pilot: suggestive, not significant"
