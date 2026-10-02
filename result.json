@@ -1,7 +1,7 @@
 {
- "updated": "2026-10-01T04:59:39Z",
- "n_days": 33,
- "n comparable": 32,
+ "updated": "2026-10-02T04:49:44Z",
+ "n_days": 34,
+ "n comparable": 33,
  "spike_threshold": 148,
  "spike_days": [
   "2026-09-01",
@@ -15,9 +15,9 @@
   "2026-09-21"
  ],
  "mean_move_after_spike": 0.0311,
- "mean_move_baseline": 0.0109,
+ "mean_move_baseline": 0.0112,
  "n_spike": 9,
- "n_base": 23,
- "latest_yes": 0.14,
+ "n_base": 24,
+ "latest_yes": 0.16,
  "note": "pilot: suggestive, not significant"
 }
