@@ -1,0 +1,89 @@
+{
+  "_note": "bbox = [lat_min, lat_max, lng_min, lng_max]. A market is tested against every region whose keywords appear in its title or description; unmatched markets fall back to 'global'. theatres = worldsitrep-cache <theatre>-events wires counted for that region.",
+  "regions": {
+    "ukraine_blacksea": {
+      "name": "Ukraine and Black Sea",
+      "bbox": [43, 53, 22, 41],
+      "theatres": ["ukraine"],
+      "keywords": ["ukraine", "ukrainian", "russia", "russian", "putin", "zelensky", "zelenskyy", "kyiv", "crimea", "black sea", "donbas", "donetsk", "odesa", "kharkiv"]
+    },
+    "europe": {
+      "name": "Europe",
+      "bbox": [36, 60, -12, 30],
+      "theatres": ["france"],
+      "keywords": ["nato", "europe", "european", "eu", "poland", "germany", "france", "macron", "uk", "britain", "starmer", "serbia", "kosovo", "moldova", "transnistria"]
+    },
+    "baltic_nordic": {
+      "name": "Baltic and Nordic",
+      "bbox": [53, 70, 9, 32],
+      "theatres": [],
+      "keywords": ["baltic", "estonia", "latvia", "lithuania", "finland", "sweden", "norway", "kaliningrad", "belarus"]
+    },
+    "middle_east": {
+      "name": "Middle East",
+      "bbox": [12, 38, 32, 63],
+      "theatres": ["iran", "gaza"],
+      "keywords": ["iran", "iranian", "israel", "israeli", "gaza", "hamas", "hezbollah", "lebanon", "syria", "iraq", "khamenei", "netanyahu", "saudi", "west bank", "tehran"]
+    },
+    "gulf_hormuz": {
+      "name": "Gulf and Strait of Hormuz",
+      "bbox": [22, 30, 47, 60],
+      "theatres": ["iran"],
+      "keywords": ["hormuz", "persian gulf", "uae", "qatar", "oman", "bahrain", "kuwait", "iran"]
+    },
+    "red_sea": {
+      "name": "Red Sea and Bab el-Mandeb",
+      "bbox": [11, 30, 32, 45],
+      "theatres": ["houthis"],
+      "keywords": ["red sea", "bab el-mandeb", "houthi", "houthis", "yemen", "suez", "egypt", "sudan", "eritrea", "djibouti"]
+    },
+    "taiwan_scs": {
+      "name": "Taiwan Strait and South China Sea",
+      "bbox": [5, 30, 105, 125],
+      "theatres": ["taiwan"],
+      "keywords": ["taiwan", "china", "chinese", "xi jinping", "beijing", "south china sea", "philippines", "pla", "taipei", "scarborough"]
+    },
+    "korea_japan": {
+      "name": "Korean Peninsula and Japan",
+      "bbox": [30, 45, 124, 146],
+      "theatres": ["korea"],
+      "keywords": ["korea", "korean", "kim jong", "pyongyang", "seoul", "japan", "japanese", "tokyo"]
+    },
+    "arctic_greenland": {
+      "name": "Arctic and Greenland",
+      "bbox": [58, 85, -75, -10],
+      "theatres": ["arctic"],
+      "keywords": ["greenland", "arctic", "denmark", "danish", "iceland", "nuuk"]
+    },
+    "sahel_africa": {
+      "name": "Sahel and North Africa",
+      "bbox": [5, 25, -18, 25],
+      "theatres": ["sahel"],
+      "keywords": ["mali", "niger", "burkina", "sahel", "chad", "wagner", "africa corps", "libya", "nigeria"]
+    },
+    "myanmar_seasia": {
+      "name": "Myanmar and South-East Asia",
+      "bbox": [5, 29, 92, 110],
+      "theatres": ["myanmar"],
+      "keywords": ["myanmar", "burma", "thailand", "cambodia", "vietnam", "laos"]
+    },
+    "south_asia": {
+      "name": "South Asia",
+      "bbox": [5, 37, 60, 98],
+      "theatres": [],
+      "keywords": ["india", "indian", "pakistan", "kashmir", "afghanistan", "taliban", "bangladesh", "modi"]
+    },
+    "americas": {
+      "name": "Caribbean and Latin America",
+      "bbox": [-35, 30, -95, -55],
+      "theatres": [],
+      "keywords": ["venezuela", "maduro", "cuba", "panama", "colombia", "mexico", "caribbean", "brazil", "argentina", "haiti"]
+    },
+    "global": {
+      "name": "Global",
+      "bbox": [-90, 90, -180, 180],
+      "theatres": [],
+      "keywords": []
+    }
+  }
+}

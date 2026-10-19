@@ -1,0 +1,54 @@
+name: Signal Ledger
+
+# Public repo: Actions minutes are free and unmetered.
+# Every 3h: sample ship counts per region (ships have no daily archive).
+# Daily 01:40 UTC: refresh markets, signals and every test, then commit
+# ledger/ JSON that the site reads from raw.githubusercontent.
+# Pull requests: run the statistics tests and a full dry run, no commit.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths: ["ledger.py", "ledger/regions.json", "tests/**", ".github/workflows/ledger.yml"]
+  schedule:
+    - cron: "17 */3 * * *"
+    - cron: "40 1 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: leadlag-update
+  cancel-in-progress: false
+
+jobs:
+  ledger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Statistics tests
+        run: python tests/test_ledger.py
+      - name: Run ledger
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MODE: ${{ github.event.schedule == '17 */3 * * *' && 'sample' || 'all' }}
+        run: python ledger.py "$MODE"
+      - name: Summary
+        if: always()
+        run: |
+          test -f ledger/index.json && python -c "import json;d=json.load(open('ledger/index.json'));print(d['counts']);[print(t['verdict'],t['id'],t.get('n'),t.get('rho'),t.get('q')) for t in d['tests'][:25]]" || echo "no index"
+      - name: Commit ledger
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          git add -- ledger
+          git diff --cached --quiet && echo "no change" && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: signal ledger update"
+          for i in 1 2 3; do git pull --rebase origin main && git push && exit 0; sleep $((i*5)); done
+          exit 1

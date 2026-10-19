@@ -18,9 +18,19 @@ public except vessel archives, which need a `LEADLAG_PAT` secret
 ## Pilot (2026-09-11, n=9 comparable days)
 
 Spike days Sep 4 + Sep 7. Mean next-day |move|: **0.035 after spikes vs
-0.013 baseline**. Suggestive, not significant — verdict at n=60
-(early November). The Sep 4 coincidence (188 aircraft + 0.19 -> 0.33
-price jump) is the thing to watch.
+0.013 baseline**. Suggestive, not significant.
+
+## Correction (2026-10-19, n=50 comparable days)
+
+Every day after 2026-09-11 had been counted from the first one or two
+snapshots of that day (the row was written on the morning run and never
+revisited), so 12 of 13 "spike days" fell in the backfilled fortnight.
+Rows are now built only for complete UTC days and the signal is aircraft
+per snapshot. Recounted: **0.022 after spikes vs 0.013 baseline**, but a
+permutation test gives p of about 0.14, and the gap disappears within
+weekdays (correlation 0.04): military flying and market moves are both
+simply higher Monday to Friday. No lead yet; the next test needs a
+weekday-adjusted signal.
 
 ## Without the PAT
 

@@ -19,7 +19,8 @@ Without it, vessel fields are null and everything else still works.
 Boxes: EU (36-60, -12-45), BlackSea air (40-48, 27-43).
 Market rung: highest-volume "December 31, 202" market in the
   russia-x-ukraine-ceasefire-agreement-by event (currently Dec-31-2026).
-Spike = eu_mil at/above 75th percentile of observed days.
+Spike = eu_mil_per_snap at/above 75th percentile of observed days.
+Only complete UTC days are counted (today is skipped until tomorrow).
 """
 from __future__ import annotations
 
@@ -80,7 +81,7 @@ def list_dir(repo: str, path: str, token: str | None) -> list[str]:
 
 
 def flight_day(url: str) -> dict:
-    eu = ti = bs = 0
+    eu = ti = bs = snaps = 0
     for line in get(url).decode("utf-8", "replace").split("\n"):
         line = line.strip()
         if not line:
@@ -90,6 +91,7 @@ def flight_day(url: str) -> dict:
         except json.JSONDecodeError:
             continue
         acs = snap.get("aircraft", snap if isinstance(snap, list) else [])
+        snaps += 1
         for a in acs:
             lat, lng = a.get("lat"), a.get("lng")
             if lat is None or lng is None:
@@ -102,7 +104,11 @@ def flight_day(url: str) -> dict:
                     ti += 1
             if in_box(lat, lng, BS_AIR):
                 bs += 1
-    return {"eu_mil": eu, "eu_tanker_isr": ti, "bs_air": bs}
+    # Snapshot counts vary by day (3-9), so the per-snapshot mean is the
+    # comparable signal; eu_mil stays as the raw sum for continuity.
+    per = round(eu / snaps, 2) if snaps else None
+    return {"eu_mil": eu, "eu_tanker_isr": ti, "bs_air": bs,
+            "snapshots": snaps, "eu_mil_per_snap": per}
 
 
 def vessel_day(repo: str, path: str, token: str) -> dict:
@@ -143,6 +149,9 @@ def vessel_day(repo: str, path: str, token: str) -> dict:
 def update_signals(token: str | None) -> list[str]:
     os.makedirs(SIG_DIR, exist_ok=True)
     days: list[str] = []
+    # Only complete UTC days: a file written mid-day undercounts and was
+    # never revisited (every day after 2026-09-11 read 1-9 aircraft).
+    today = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
     for mon in ("08", "09", "10", "11", "12"):
         base = f"flight-data/archive/2026/{mon}"
         try:
@@ -156,8 +165,11 @@ def update_signals(token: str | None) -> list[str]:
             continue
         for f in files:
             day = f"2026-{mon}-{f.replace('.jsonl', '')}"
+            if day >= today:
+                continue
             out = os.path.join(SIG_DIR, f"{day}.json")
-            if os.path.exists(out):
+            # Rows written before snapshot counting are rebuilt once.
+            if os.path.exists(out) and "snapshots" in json.load(open(out)):
                 days.append(day)
                 continue
             try:
@@ -248,21 +260,22 @@ def analyze() -> dict:
     closes = sorted(mkt.items())
     moves = {closes[i][0]: abs(closes[i + 1][1] - closes[i][1])
              for i in range(len(closes) - 1)}
-    eu = [r["eu_mil"] for r in rows
-          if isinstance(r.get("eu_mil"), int)]
+    sig = "eu_mil_per_snap"
+    eu = [r[sig] for r in rows if isinstance(r.get(sig), (int, float))]
     thresh = sorted(eu)[int(len(eu) * 0.75)] if eu else 0
     spikes, sm, bm = [], [], []
     for r in rows:
         d = r["date"]
         if d not in moves:
             continue
-        s = isinstance(r.get("eu_mil"), int) and r["eu_mil"] >= thresh
+        s = isinstance(r.get(sig), (int, float)) and r[sig] >= thresh
         (sm if s else bm).append(moves[d])
         if s:
             spikes.append(d)
     res = {
         "updated": datetime.datetime.now(
             datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "signal": sig,
         "n_days": len(rows),
         "n comparable": len(sm) + len(bm),
         "spike_threshold": thresh,
@@ -289,11 +302,11 @@ def analyze() -> dict:
     ax1.set_ylabel("Yes price", color="#38bdf8")
     ax2 = ax1.twinx()
     sds = [datetime.datetime.strptime(r["date"], "%Y-%m-%d") for r in rows]
-    ev = [r["eu_mil"] if isinstance(r.get("eu_mil"), int) else 0
+    ev = [r[sig] if isinstance(r.get(sig), (int, float)) else 0
           for r in rows]
     cols = ["#ef4444" if r["date"] in spikes else "#f59e0b" for r in rows]
     ax2.bar(sds, ev, alpha=0.6, color=cols)
-    ax2.set_ylabel("EU mil-aircraft", color="#f59e0b")
+    ax2.set_ylabel("EU mil-aircraft per snapshot", color="#f59e0b")
     ax1.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d"))
     fig.autofmt_xdate()
     fig.suptitle("Do ADS-B signals lead Polymarket? (daily, auto-updated)")
