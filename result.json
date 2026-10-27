@@ -1,8 +1,8 @@
 {
- "updated": "2026-10-26T03:57:57Z",
+ "updated": "2026-10-27T04:19:24Z",
  "signal": "eu_mil_per_snap",
- "n_days": 57,
- "n comparable": 56,
+ "n_days": 58,
+ "n comparable": 58,
  "spike_threshold": 39.5,
  "spike_days": [
   "2026-09-02",
@@ -22,9 +22,9 @@
   "2026-10-22"
  ],
  "mean_move_after_spike": 0.0204,
- "mean_move_baseline": 0.0141,
+ "mean_move_baseline": 0.0136,
  "n_spike": 15,
- "n_base": 41,
- "latest_yes": 0.16,
+ "n_base": 43,
+ "latest_yes": 0.17,
  "note": "n>=10 spikes: read the means"
 }
