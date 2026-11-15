@@ -1,10 +1,13 @@
 name: Daily lead-lag update
 
+# Retired from the schedule in November 2026. This was the first single-market
+# prototype (EU military flights against one Ukraine ceasefire market). The
+# Signal Ledger (ledger.yml) now tests every signal against every market, and
+# the site reads only ledger/. The prototype's flight archive months return
+# 404 and its Polymarket endpoint 410, so the daily run failed every day.
+# It can still be started by hand.
 on:
   workflow_dispatch:
-  schedule:
-    # 07:00 ICT daily (00:00 UTC) - after collectors land
-    - cron: "0 0 * * *"
 
 permissions:
   contents: write

@@ -65,6 +65,20 @@ def test_keyword_regions():
     assert "europe" not in ledger.match_regions("Will Trump meet Putin?", regions)
 
 
+def test_watch_row():
+    m = {"title": "Netanyahu out by...?", "question": "Netanyahu out by end of 2026?",
+         "token": "1146947", "regions": ["middle_east"], "volume": 10,
+         "eventVolume": 125, "endDate": "2026-12-31T00:00:00Z", "closes": {}}
+    row = ledger.watch_row("netanyahu-out-before-2027", m)
+    assert row == {"slug": "netanyahu-out-before-2027", "title": "Netanyahu out by...?",
+                   "question": "Netanyahu out by end of 2026?", "token": "1146947",
+                   "regions": ["middle_east"], "volume": 125,
+                   "endDate": "2026-12-31T00:00:00Z"}, row
+    # No token means nothing to price, so no row.
+    assert ledger.watch_row("x", {"title": "t", "question": "q"}) is None
+    assert ledger.watch_row("x", {"token": ""}) is None
+
+
 if __name__ == "__main__":
     for name, fn in sorted(globals().items()):
         if name.startswith("test_"):

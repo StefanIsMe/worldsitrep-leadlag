@@ -381,6 +381,22 @@ def update_markets(regions: dict) -> list[str]:
     return live
 
 
+def watch_row(slug: str, m: dict) -> dict | None:
+    """Compact row for the 5-minute watchers: one YES token per event.
+
+    The watchers price every listed token in a single CLOB /midpoints call,
+    so the row carries only what they need to label and group a move.
+    """
+    token = str(m.get("token") or "")
+    if not token:
+        return None
+    return {"slug": slug, "title": m.get("title", ""),
+            "question": m.get("question", ""), "token": token,
+            "regions": m.get("regions", []),
+            "volume": m.get("eventVolume", m.get("volume")),
+            "endDate": m.get("endDate")}
+
+
 # ---------------------------------------------------------------- stats
 
 def ranks(xs: list[float]) -> list[float]:
@@ -505,9 +521,12 @@ def score(regions: dict, live: list[str]) -> dict:
     series = signal_series(regions)
     registry = load(REGISTRY, {})
     today = today_utc().isoformat()
-    tests, topics = [], []
+    tests, topics, watch = [], [], []
     for slug in live:
         m = load(os.path.join(MARKET_DIR, slug + ".json"), None)
+        row = watch_row(slug, m) if m else None
+        if row:
+            watch.append(row)
         if not m or not m.get("closes"):
             continue
         sigs = [sid for sid in series
@@ -559,7 +578,12 @@ def score(regions: dict, live: list[str]) -> dict:
     save(os.path.join(OUT, "topics.json"),
          {"schemaVersion": 1, "updated": now, "count": len(topics),
           "topics": topics})
-    print(f"ledger: {len(topics)} topics, {len(tests)} tests, {counts}", flush=True)
+    watch.sort(key=lambda r: -(r["volume"] or 0))
+    save(os.path.join(OUT, "watchlist.json"),
+         {"schemaVersion": 1, "updated": now, "count": len(watch),
+          "markets": watch})
+    print(f"ledger: {len(topics)} topics, {len(tests)} tests, {counts}, "
+          f"{len(watch)} watched markets", flush=True)
     return index
 
 
